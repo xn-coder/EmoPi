@@ -12,7 +12,7 @@ type EmojiBuilderProps = {
 export default function EmojiBuilder({ activeFrame, isAnimating = false }: EmojiBuilderProps) {
   return (
     <div className="w-full flex-grow flex items-center justify-center">
-        <Card className="relative w-full max-w-md aspect-square flex items-center justify-center bg-accent/20">
+        <Card className="relative w-full max-w-md aspect-square flex items-center justify-center bg-black">
           <EmojiPreview frame={activeFrame} isAnimating={isAnimating}/>
         </Card>
     </div>
