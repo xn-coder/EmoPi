@@ -3,11 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { Frame } from '@/lib/types';
 import EmojiBuilder from '@/components/emoji-builder';
-import { useToast } from "@/hooks/use-toast";
 import emojiData from '@/lib/emojis.json';
-import { Button } from '@/components/ui/button';
-import { Pause, Shuffle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const initialFrame: Frame = {
   id: 'initial-frame',
@@ -31,9 +27,16 @@ export default function Home() {
   const activeFrame = frames.find((frame) => frame.id === activeFrameId) || frames[0];
 
   // State for random playback
-  const [isPlayingRandom, setIsPlayingRandom] = useState(false);
+  const [isPlayingRandom, setIsPlayingRandom] = useState(true);
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
   const [randomFrameIndex, setRandomFrameIndex] = useState(0);
+
+  // Effect to start random playback on load
+  useEffect(() => {
+    const newShuffledList = shuffleArray(emojiData.emojis);
+    setShuffledEmojis(newShuffledList);
+    setRandomFrameIndex(0);
+  }, []);
 
   // Effect for random playback
   useEffect(() => {
@@ -65,17 +68,6 @@ export default function Home() {
     }
   }, [randomFrameIndex, isPlayingRandom, shuffledEmojis]);
 
-  const handleToggleRandomPlay = () => {
-    if (!isPlayingRandom) {
-      // Start playing
-      const newShuffledList = shuffleArray(emojiData.emojis);
-      setShuffledEmojis(newShuffledList);
-      setRandomFrameIndex(0);
-    }
-    setIsPlayingRandom(!isPlayingRandom);
-  };
-
-
   if (!activeFrame) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -86,32 +78,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-background font-body overflow-hidden">
-      <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6 overflow-y-auto">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6">
         <EmojiBuilder 
           activeFrame={activeFrame}
           isAnimating={isPlayingRandom}
         />
-        <div className="mt-4">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={handleToggleRandomPlay} 
-                  size="lg"
-                  className="px-6 py-6 text-lg"
-                >
-                  {isPlayingRandom ? <Pause className="mr-2"/> : <Shuffle className="mr-2"/>}
-                  {isPlayingRandom ? 'Stop' : 'Play Random Emojis'}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isPlayingRandom ? 'Stop random playback' : 'Play all emojis randomly'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
       </main>
     </div>
   );
