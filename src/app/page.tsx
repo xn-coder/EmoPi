@@ -113,6 +113,14 @@ export default function Home() {
     }, 4000);
   };
 
+  const handleFullScreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+    }
+  };
+
   if (!activeFrame) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -156,7 +164,7 @@ export default function Home() {
         onClick={handleShowTimeClick}
         aria-label="Show current time"
       />
-      <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6 cursor-pointer" onClick={handleFullScreen}>
         {renderContent()}
       </main>
     </div>
