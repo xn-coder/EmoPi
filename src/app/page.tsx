@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { Frame } from '@/lib/types';
 import EmojiBuilder from '@/components/emoji-builder';
-import { handleAiReaction } from './actions';
 import { useToast } from "@/hooks/use-toast";
-import ChatInterface from '@/components/chat-interface';
 import emojiData from '@/lib/emojis.json';
+import { Button } from '@/components/ui/button';
+import { Pause, Shuffle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const initialFrame: Frame = {
   id: 'initial-frame',
@@ -26,28 +27,13 @@ function shuffleArray<T>(array: T[]): T[] {
 export default function Home() {
   const [frames, setFrames] = useState<Frame[]>([initialFrame]);
   const [activeFrameId, setActiveFrameId] = useState<string>(initialFrame.id);
-  const [isAiReacting, setIsAiReacting] = useState(false);
-  const { toast } = useToast();
-
+  
   const activeFrame = frames.find((frame) => frame.id === activeFrameId) || frames[0];
-  const [animatedReaction, setAnimatedReaction] = useState<Frame | null>(null);
 
   // State for random playback
   const [isPlayingRandom, setIsPlayingRandom] = useState(false);
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
   const [randomFrameIndex, setRandomFrameIndex] = useState(0);
-
-  useEffect(() => {
-    if (animatedReaction) {
-      const timer = setTimeout(() => {
-        const newFrame = animatedReaction;
-        setFrames([newFrame]);
-        setActiveFrameId(newFrame.id);
-        setAnimatedReaction(null);
-      }, 1000); // Let animation play
-      return () => clearTimeout(timer);
-    }
-  }, [animatedReaction]);
 
   // Effect for random playback
   useEffect(() => {
@@ -79,36 +65,7 @@ export default function Home() {
     }
   }, [randomFrameIndex, isPlayingRandom, shuffledEmojis]);
 
-
-  const onAiReaction = async (message: string) => {
-    if (isPlayingRandom) setIsPlayingRandom(false); // Stop random playback
-    setIsAiReacting(true);
-    try {
-        const result = await handleAiReaction(message);
-        if (result && result.reaction) {
-            const newFrame: Frame = {
-                id: crypto.randomUUID(),
-                emojiName: result.reaction.emoji,
-            };
-            setAnimatedReaction(newFrame);
-
-        } else {
-            throw new Error(result.error || "Invalid AI response");
-        }
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "AI Reaction Failed",
-            description: "Could not get AI reaction. Please try again.",
-        });
-    } finally {
-        setIsAiReacting(false);
-    }
-  };
-
   const handleToggleRandomPlay = () => {
-    setAnimatedReaction(null); // Stop any AI reaction animation
-    
     if (!isPlayingRandom) {
       // Start playing
       const newShuffledList = shuffleArray(emojiData.emojis);
@@ -129,17 +86,32 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-background font-body overflow-hidden">
-      <main className="flex-grow flex flex-col p-4 lg:p-6 gap-6 overflow-y-auto">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6 overflow-y-auto">
         <EmojiBuilder 
-          activeFrame={animatedReaction || activeFrame}
-          isAnimating={!!animatedReaction || isPlayingRandom}
+          activeFrame={activeFrame}
+          isAnimating={isPlayingRandom}
         />
-        <ChatInterface 
-          onSendMessage={onAiReaction} 
-          isSending={isAiReacting}
-          onToggleRandomPlay={handleToggleRandomPlay}
-          isPlayingRandom={isPlayingRandom}
-        />
+        <div className="mt-4">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleToggleRandomPlay} 
+                  size="lg"
+                  className="px-6 py-6 text-lg"
+                >
+                  {isPlayingRandom ? <Pause className="mr-2"/> : <Shuffle className="mr-2"/>}
+                  {isPlayingRandom ? 'Stop' : 'Play Random Emojis'}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isPlayingRandom ? 'Stop random playback' : 'Play all emojis randomly'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </main>
     </div>
   );
