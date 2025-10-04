@@ -5,7 +5,7 @@ import Image from 'next/image';
 export function EmojiPreview({ frame, size = 400, isAnimating = false }: { frame: Frame; size?: number; isAnimating?: boolean }) {
   const effectiveSize = Math.min(size, 400);
   const { eyes, mouth, eyebrows } = frame.facialFeatures;
-  const emojiImageSrc = `/emojis/${eyes}_${mouth}_${eyebrows}.png`;
+  const emojiImageSrc = `/emojis/${eyes}_${mouth}_${eyebrows}.webp`;
 
   return (
     <div className={cn("relative transition-transform duration-300 ease-in-out", isAnimating ? 'animate-bounce' : 'hover:scale-105')} style={{ width: effectiveSize, height: effectiveSize }}>
@@ -17,7 +17,7 @@ export function EmojiPreview({ frame, size = 400, isAnimating = false }: { frame
         unoptimized // Since we are using many dynamic images
         onError={(e) => {
             // Fallback to a default image if a specific combination doesn't exist
-            e.currentTarget.src = '/emojis/default_smile_default.png';
+            e.currentTarget.src = '/emojis/default_smile_default.webp';
         }}
         />
     </div>
