@@ -28,7 +28,12 @@ export default function Home() {
 
   useEffect(() => {
     if (animatedReaction) {
-      const timer = setTimeout(() => setAnimatedReaction(null), 1000); // Animation duration
+      const timer = setTimeout(() => {
+        // After animation, update the main frame and reset animation state
+        setFrames([animatedReaction]);
+        setActiveFrameId(animatedReaction.id);
+        setAnimatedReaction(null);
+      }, 1000); // Animation duration
       return () => clearTimeout(timer);
     }
   }, [animatedReaction]);
@@ -46,10 +51,8 @@ export default function Home() {
                     eyebrows: (eyebrowOptions.includes(result.reaction.eyebrows) ? result.reaction.eyebrows : 'default') as EyebrowOption,
                 }
             };
+            // Only set the animation. The useEffect will handle updating the main state.
             setAnimatedReaction(newFrame);
-            // Also update the main builder and timeline
-            setFrames([newFrame]);
-            setActiveFrameId(newFrame.id);
 
         } else {
             throw new Error(result.error || "Invalid AI response");
