@@ -28,7 +28,7 @@ User message: {{{input}}}
 Your response must be a valid emoji name from the following list:
 ${emojiData.emojis.join(', ')}
 
-Choose the single best emoji from the list and return it in the output format.`,
+Choose the single best emoji from the list and return it in the JSON output format.`,
 });
 
 const emojiReactionFlow = ai.defineFlow(

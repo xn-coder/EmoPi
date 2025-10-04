@@ -11,15 +11,17 @@ export const EmojiReactionOutputSchema = z.object({
 export const SmoothAnimationTransitionsInputSchema = z.object({
   frames: z.array(
     z.object({
-      facialFeatures: z.record(z.string(), z.any()).describe('Facial feature settings for this frame.'),
+      id: z.string(),
+      emojiName: z.string(),
     })
-  ).describe('Array of animation frames, each containing facial feature settings.'),
+  ),
 });
 
 export const SmoothAnimationTransitionsOutputSchema = z.object({
   smoothedFrames: z.array(
-    z.object({
-      facialFeatures: z.record(z.string(), z.any()).describe('Smoothed facial feature settings for this frame.'),
+     z.object({
+      id: z.string(),
+      emojiName: z.string(),
     })
-  ).describe('Array of animation frames with smoothed transitions.'),
+  ),
 });
