@@ -48,7 +48,7 @@ export default function Home() {
           }
           return nextIndex;
         });
-      }, 3000); // Change emoji every 3 seconds
+      }, 4000); // Change emoji every 4 seconds
     }
     return () => clearInterval(interval);
   }, [isPlayingRandom, shuffledEmojis]);
