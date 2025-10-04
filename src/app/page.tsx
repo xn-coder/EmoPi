@@ -31,6 +31,10 @@ export default function Home() {
   const [shuffledEmojis, setShuffledEmojis] = useState<string[]>([]);
   const [randomFrameIndex, setRandomFrameIndex] = useState(0);
 
+  // State for showing the time
+  const [showTime, setShowTime] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
+
   // Effect to start random playback on load
   useEffect(() => {
     const newShuffledList = shuffleArray(emojiData.emojis);
@@ -68,7 +72,19 @@ export default function Home() {
     }
   }, [randomFrameIndex, isPlayingRandom, shuffledEmojis]);
 
-  if (!activeFrame) {
+  const handleShowTimeClick = () => {
+    // This function will only run on the client, so `new Date()` is safe.
+    setCurrentTime(new Date().toLocaleTimeString());
+    setShowTime(true);
+    setIsPlayingRandom(false);
+
+    setTimeout(() => {
+      setShowTime(false);
+      setIsPlayingRandom(true);
+    }, 4000);
+  };
+  
+  if (!activeFrame && !showTime) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-xl">Loading Editor...</div>
@@ -78,11 +94,22 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-background font-body overflow-hidden">
+      <div
+        className="absolute top-4 right-4 w-20 h-20 z-10 cursor-pointer"
+        onClick={handleShowTimeClick}
+        aria-label="Show current time"
+      />
       <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6">
-        <EmojiBuilder 
-          activeFrame={activeFrame}
-          isAnimating={isPlayingRandom}
-        />
+        {showTime ? (
+          <div className="text-8xl font-bold text-foreground animate-emoji-in">
+            {currentTime}
+          </div>
+        ) : (
+          <EmojiBuilder 
+            activeFrame={activeFrame}
+            isAnimating={isPlayingRandom}
+          />
+        )}
       </main>
     </div>
   );
