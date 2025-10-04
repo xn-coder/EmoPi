@@ -62,7 +62,7 @@ export default function Home() {
           }
           return nextIndex;
         });
-      }, 1500); // Change emoji every 1.5 seconds
+      }, 2000); // Change emoji every 2 seconds
     }
     return () => clearInterval(interval);
   }, [isPlayingRandom, shuffledEmojis]);
@@ -132,7 +132,7 @@ export default function Home() {
       <main className="flex-grow flex flex-col p-4 lg:p-6 gap-6 overflow-y-auto">
         <EmojiBuilder 
           activeFrame={animatedReaction || activeFrame}
-          isAnimating={!!animatedReaction}
+          isAnimating={!!animatedReaction || isPlayingRandom}
         />
         <ChatInterface 
           onSendMessage={onAiReaction} 

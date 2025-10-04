@@ -10,7 +10,7 @@ export function EmojiPreview({ frame, size = 400, isAnimating = false }: { frame
   const emojiImageSrc = `/emojis/${trimmedEmojiName}.webp`;
 
   return (
-    <div className={cn("relative transition-transform duration-300 ease-in-out", isAnimating ? 'animate-bounce' : 'hover:scale-105')} style={{ width: effectiveSize, height: effectiveSize }}>
+    <div className={cn("relative transition-transform duration-300 ease-in-out", isAnimating ? 'animate-pulse' : 'hover:scale-105')} style={{ width: effectiveSize, height: effectiveSize }}>
       <Image 
         key={emojiImageSrc}
         src={emojiImageSrc} 
