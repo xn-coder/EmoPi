@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -59,6 +60,18 @@ export default function Home() {
     }
     return () => clearInterval(interval);
   }, [isPlayingRandom, shuffledEmojis]);
+  
+    // Effect to update time every second when the clock is shown
+  useEffect(() => {
+    let timeInterval: NodeJS.Timeout | undefined;
+    if (showTime) {
+      timeInterval = setInterval(() => {
+        // This runs on the client, so `new Date()` is safe.
+        setCurrentTime(new Date().toLocaleTimeString());
+      }, 1000);
+    }
+    return () => clearInterval(timeInterval);
+  }, [showTime]);
 
   // Update the active frame during random playback
   useEffect(() => {
@@ -84,7 +97,7 @@ export default function Home() {
     }, 4000);
   };
   
-  if (!activeFrame && !showTime) {
+  if (!activeFrame) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-xl">Loading Editor...</div>
