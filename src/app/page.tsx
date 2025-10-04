@@ -164,7 +164,7 @@ export default function Home() {
         onClick={handleShowTimeClick}
         aria-label="Show current time"
       />
-      <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6 cursor-pointer" onClick={handleFullScreen}>
+      <main className="flex-grow flex items-center justify-center cursor-pointer" onClick={handleFullScreen}>
         {renderContent()}
       </main>
     </div>
