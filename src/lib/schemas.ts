@@ -1,10 +1,8 @@
 import { z } from 'zod';
-import { eyeOptions, mouthOptions, eyebrowOptions } from '@/lib/types';
+import emojiData from './emojis.json';
 
 export const EmojiReactionOutputSchema = z.object({
-  eyes: z.enum(eyeOptions).describe('The state of the eyes.'),
-  mouth: z.enum(mouthOptions).describe('The state of the mouth.'),
-  eyebrows: z.enum(eyebrowOptions).describe('The state of the eyebrows.'),
+  emoji: z.enum(emojiData.emojis as [string, ...string[]]).describe('The name of the emoji to display.'),
 });
 
 export const SmoothAnimationTransitionsInputSchema = z.object({

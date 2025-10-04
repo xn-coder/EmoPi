@@ -4,6 +4,7 @@ import { smoothAnimationTransitions } from '@/ai/flows/smooth-animation-transiti
 import { emojiReaction } from '@/ai/flows/emoji-reaction-flow';
 import type { Frame } from '@/lib/types';
 import { z } from 'zod';
+import { EmojiReactionOutputSchema } from '@/lib/schemas';
 
 const SmoothAnimationInputSchema = z.object({
   frames: z.array(
@@ -19,32 +20,20 @@ const SmoothAnimationInputSchema = z.object({
 });
 
 export async function handleSmoothAnimation(input: { frames: Frame[] }) {
-    const validatedInput = SmoothAnimationInputSchema.safeParse(input);
-
-    if (!validatedInput.success) {
-        console.error("Invalid input for smoothing:", validatedInput.error);
-        return { error: "Invalid input format." };
-    }
-
-    const aiInput = {
-        frames: validatedInput.data.frames.map(frame => ({
-            facialFeatures: frame.facialFeatures,
-        })),
-    };
-
-    try {
-        const result = await smoothAnimationTransitions(aiInput);
-        return result;
-    } catch (error) {
-        console.error("Error in smoothAnimationTransitions:", error);
-        return { error: "AI processing failed." };
-    }
+    // This function is not compatible with the new Frame type
+    console.warn("handleSmoothAnimation is not implemented for the new emoji structure");
+    return { error: "Smoothing not available." };
 }
 
 export async function handleAiReaction(message: string) {
     try {
         const result = await emojiReaction(message);
-        return { reaction: result };
+        const validatedResult = EmojiReactionOutputSchema.safeParse(result);
+        if (!validatedResult.success) {
+            console.error("Invalid AI response schema:", validatedResult.error);
+            return { error: "Invalid AI response format." };
+        }
+        return { reaction: validatedResult.data };
     } catch (error) {
         console.error("Error in emojiReaction:", error);
         return { error: "AI processing failed." };

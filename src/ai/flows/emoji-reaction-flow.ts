@@ -8,7 +8,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { eyeOptions, mouthOptions, eyebrowOptions } from '@/lib/types';
 import { EmojiReactionOutputSchema } from '@/lib/schemas';
 import type { EmojiReactionOutput } from '@/lib/types';
 import emojiData from '@/lib/emojis.json';
@@ -22,16 +21,14 @@ const prompt = ai.definePrompt({
   name: 'emojiReactionPrompt',
   input: { schema: z.string() },
   output: { schema: EmojiReactionOutputSchema },
-  prompt: `You are an AI assistant that communicates through emoji facial expressions. Based on the user's message, determine the most appropriate facial expression.
+  prompt: `You are an AI assistant that communicates through emoji reactions. Based on the user's message, determine the most appropriate emoji reaction.
 
 User message: {{{input}}}
 
-Your response must be a valid emoji combination.
-A valid combination is one that exists in the following list of available emojis:
+Your response must be a valid emoji name from the following list:
 ${emojiData.emojis.join(', ')}
 
-The format of each item is: eyes_mouth_eyebrows.
-From the chosen combination, extract the eye, mouth, and eyebrow values and return them in the output format.`,
+Choose the single best emoji from the list and return it in the output format.`,
 });
 
 const emojiReactionFlow = ai.defineFlow(
@@ -44,13 +41,10 @@ const emojiReactionFlow = ai.defineFlow(
     const { output } = await prompt(message);
     
     // Validate that the combination is valid
-    const combination = `${output!.eyes}_${output!.mouth}_${output!.eyebrows}`;
-    if (!emojiData.emojis.includes(combination)) {
+    if (!emojiData.emojis.includes(output!.emoji)) {
       // Fallback to a default safe combination if the model hallucinates
       return {
-        eyes: 'default',
-        mouth: 'smile',
-        eyebrows: 'default',
+        emoji: 'Smiling Face',
       };
     }
     

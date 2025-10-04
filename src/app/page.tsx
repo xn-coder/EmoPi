@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
-import type { Frame, EyeOption, MouthOption, EyebrowOption } from '@/lib/types';
-import { eyeOptions, mouthOptions, eyebrowOptions } from '@/lib/types';
+import { useState, useEffect } from 'react';
+import type { Frame } from '@/lib/types';
 import EmojiBuilder from '@/components/emoji-builder';
 import { handleAiReaction } from './actions';
 import { useToast } from "@/hooks/use-toast";
@@ -10,11 +9,7 @@ import ChatInterface from '@/components/chat-interface';
 
 const initialFrame: Frame = {
   id: 'initial-frame',
-  facialFeatures: {
-    eyes: 'default',
-    mouth: 'smile',
-    eyebrows: 'default',
-  },
+  emojiName: 'Smiling Face',
 };
 
 export default function Home() {
@@ -45,11 +40,7 @@ export default function Home() {
         if (result && result.reaction) {
             const newFrame: Frame = {
                 id: crypto.randomUUID(),
-                facialFeatures: {
-                    eyes: (eyeOptions.includes(result.reaction.eyes) ? result.reaction.eyes : 'default') as EyeOption,
-                    mouth: (mouthOptions.includes(result.reaction.mouth) ? result.reaction.mouth : 'smile') as MouthOption,
-                    eyebrows: (eyebrowOptions.includes(result.reaction.eyebrows) ? result.reaction.eyebrows : 'default') as EyebrowOption,
-                }
+                emojiName: result.reaction.emoji,
             };
             // Only set the animation. The useEffect will handle updating the main state.
             setAnimatedReaction(newFrame);

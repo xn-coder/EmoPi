@@ -11,11 +11,7 @@ export type EyebrowOption = typeof eyebrowOptions[number];
 
 export type Frame = {
   id: string;
-  facialFeatures: {
-    eyes: EyeOption;
-    mouth: MouthOption;
-    eyebrows: EyebrowOption;
-  };
+  emojiName: string;
 };
 
 export type EmojiReactionOutput = z.infer<typeof EmojiReactionOutputSchema>;
