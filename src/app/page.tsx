@@ -3,9 +3,7 @@
 import { useState, useTransition, useEffect } from 'react';
 import type { Frame, EyeOption, MouthOption, EyebrowOption } from '@/lib/types';
 import { eyeOptions, mouthOptions, eyebrowOptions } from '@/lib/types';
-import Header from '@/components/header';
 import EmojiBuilder from '@/components/emoji-builder';
-import AnimationTimeline from '@/components/animation-timeline';
 import { handleSmoothAnimation, handleAiReaction } from './actions';
 import { useToast } from "@/hooks/use-toast";
 import ChatInterface from '@/components/chat-interface';
@@ -155,7 +153,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-background font-body overflow-hidden">
-      <Header />
       <main className="flex-grow flex flex-col p-4 lg:p-6 gap-6 overflow-y-auto">
         <EmojiBuilder 
           activeFrame={animatedReaction || activeFrame}
@@ -164,15 +161,6 @@ export default function Home() {
         />
         <ChatInterface onSendMessage={onAiReaction} isSending={isAiReacting} />
       </main>
-       <AnimationTimeline
-          frames={frames}
-          activeFrameId={activeFrameId}
-          setActiveFrameId={setActiveFrameId}
-          addFrame={addFrame}
-          deleteFrame={deleteFrame}
-          onSmoothAnimation={onSmoothAnimation}
-          isSmoothing={isPending}
-        />
     </div>
   );
 }
