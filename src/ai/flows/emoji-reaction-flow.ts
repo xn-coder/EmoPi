@@ -11,6 +11,7 @@ import { z } from 'genkit';
 import { eyeOptions, mouthOptions, eyebrowOptions } from '@/lib/types';
 import { EmojiReactionOutputSchema } from '@/lib/schemas';
 import type { EmojiReactionOutput } from '@/lib/types';
+import { availableEmojis } from '@/lib/emojis';
 
 
 export async function emojiReaction(message: string): Promise<EmojiReactionOutput> {
@@ -25,12 +26,12 @@ const prompt = ai.definePrompt({
 
 User message: {{{input}}}
 
-Available features:
-Eyes: ${eyeOptions.join(', ')}
-Mouth: ${mouthOptions.join(', ')}
-Eyebrows: ${eyebrowOptions.join(', ')}
+Your response must be a valid emoji combination.
+A valid combination is one that exists in the following list of available emojis:
+${availableEmojis.join(', ')}
 
-Choose one of each feature to form a reaction.`,
+The format of each item is: eyes_mouth_eyebrows.
+From the chosen combination, extract the eye, mouth, and eyebrow values and return them in the output format.`,
 });
 
 const emojiReactionFlow = ai.defineFlow(
@@ -41,6 +42,18 @@ const emojiReactionFlow = ai.defineFlow(
   },
   async (message) => {
     const { output } = await prompt(message);
+    
+    // Validate that the combination is valid
+    const combination = `${output!.eyes}_${output!.mouth}_${output!.eyebrows}`;
+    if (!availableEmojis.includes(combination)) {
+      // Fallback to a default safe combination if the model hallucinates
+      return {
+        eyes: 'default',
+        mouth: 'smile',
+        eyebrows: 'default',
+      };
+    }
+    
     return output!;
   }
 );
