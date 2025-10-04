@@ -36,6 +36,10 @@ export default function Home() {
   const [showTime, setShowTime] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
 
+  // State for showing the date
+  const [showDate, setShowDate] = useState(false);
+  const [currentDate, setCurrentDate] = useState('');
+
   // Effect to start random playback on load
   useEffect(() => {
     const newShuffledList = shuffleArray(emojiData.emojis);
@@ -97,6 +101,18 @@ export default function Home() {
     }, 4000);
   };
   
+  const handleShowDateClick = () => {
+    // This function will only run on the client, so `new Date()` is safe.
+    setCurrentDate(new Date().toDateString());
+    setShowDate(true);
+    setIsPlayingRandom(false);
+
+    setTimeout(() => {
+      setShowDate(false);
+      setIsPlayingRandom(true);
+    }, 4000);
+  };
+
   if (!activeFrame) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -105,24 +121,43 @@ export default function Home() {
     );
   }
 
+  const renderContent = () => {
+    if (showTime) {
+      return (
+        <div className="text-8xl font-bold text-foreground animate-emoji-in">
+          {currentTime}
+        </div>
+      );
+    }
+    if (showDate) {
+      return (
+        <div className="text-6xl font-bold text-foreground animate-emoji-in">
+          {currentDate}
+        </div>
+      );
+    }
+    return (
+      <EmojiBuilder 
+        activeFrame={activeFrame}
+        isAnimating={isPlayingRandom}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background font-body overflow-hidden">
+      <div
+        className="absolute top-4 left-4 w-20 h-20 z-10 cursor-pointer"
+        onClick={handleShowDateClick}
+        aria-label="Show current date"
+      />
       <div
         className="absolute top-4 right-4 w-20 h-20 z-10 cursor-pointer"
         onClick={handleShowTimeClick}
         aria-label="Show current time"
       />
       <main className="flex-grow flex flex-col items-center justify-center p-4 lg:p-6 gap-6">
-        {showTime ? (
-          <div className="text-8xl font-bold text-foreground animate-emoji-in">
-            {currentTime}
-          </div>
-        ) : (
-          <EmojiBuilder 
-            activeFrame={activeFrame}
-            isAnimating={isPlayingRandom}
-          />
-        )}
+        {renderContent()}
       </main>
     </div>
   );
