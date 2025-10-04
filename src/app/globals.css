@@ -66,3 +66,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes emoji-in {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes emoji-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
+
+  .animate-emoji-in {
+    animation: emoji-in 300ms ease-in-out forwards;
+  }
+
+  .animate-emoji-out {
+    animation: emoji-out 300ms ease-in-out forwards;
+  }
+}

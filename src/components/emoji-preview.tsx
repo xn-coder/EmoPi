@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { Frame } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -5,26 +6,50 @@ import Image from 'next/image';
 export function EmojiPreview({ frame, size = 400, isAnimating = false }: { frame: Frame; size?: number; isAnimating?: boolean }) {
   const effectiveSize = Math.min(size, 400);
   const { emojiName } = frame;
-  // Trim whitespace from the emoji name to prevent path errors
   const trimmedEmojiName = emojiName.trim();
-  const emojiImageSrc = `/emojis/${trimmedEmojiName}.webp`;
+  const newImageSrc = `/emojis/${trimmedEmojiName}.webp`;
+
+  const [currentImage, setCurrentImage] = useState(newImageSrc);
+  const [previousImage, setPreviousImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (newImageSrc !== currentImage) {
+      setPreviousImage(currentImage);
+      setCurrentImage(newImageSrc);
+      const timer = setTimeout(() => setPreviousImage(null), 300); // Duration of animation
+      return () => clearTimeout(timer);
+    }
+  }, [newImageSrc, currentImage]);
+
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error(`Failed to load emoji image: ${e.currentTarget.src}`);
+    e.currentTarget.src = '/emojis/Neutral Face.webp';
+  };
 
   return (
-    <div className={cn("relative transition-transform duration-300 ease-in-out", isAnimating ? 'animate-pulse' : 'hover:scale-105')} style={{ width: effectiveSize, height: effectiveSize }}>
+    <div className={cn("relative transition-transform duration-300 ease-in-out", isAnimating ? 'scale-105' : 'hover:scale-105')} style={{ width: effectiveSize, height: effectiveSize }}>
+      {previousImage && (
+        <Image 
+          key={previousImage}
+          src={previousImage} 
+          alt=""
+          width={effectiveSize}
+          height={effectiveSize}
+          unoptimized
+          className="absolute inset-0 animate-emoji-out"
+          aria-hidden="true"
+        />
+      )}
       <Image 
-        key={emojiImageSrc}
-        src={emojiImageSrc} 
+        key={currentImage}
+        src={currentImage} 
         alt={`Emoji reaction: ${trimmedEmojiName}`}
         width={effectiveSize}
         height={effectiveSize}
-        unoptimized // Since we are using many dynamic images
-        onError={(e) => {
-            // Log the problematic image source to the console for debugging
-            console.error(`Failed to load emoji image: ${emojiImageSrc}`);
-            // Fallback to a default image if a specific combination doesn't exist
-            e.currentTarget.src = '/emojis/Neutral Face.webp';
-        }}
-        />
+        unoptimized
+        onError={handleError}
+        className={cn("animate-emoji-in", isAnimating ? 'scale-105' : '')}
+      />
     </div>
   );
 }
