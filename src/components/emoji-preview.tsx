@@ -18,7 +18,7 @@ export function EmojiPreview({ frame, size = 400, isAnimating = false }: { frame
         unoptimized // Since we are using many dynamic images
         onError={(e) => {
             // Fallback to a default image if a specific combination doesn't exist
-            e.currentTarget.src = '/emojis/Smiling Face.webp';
+            e.currentTarget.src = '/emojis/Neutral Face.webp';
         }}
         />
     </div>

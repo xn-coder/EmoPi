@@ -9,7 +9,7 @@ import ChatInterface from '@/components/chat-interface';
 
 const initialFrame: Frame = {
   id: 'initial-frame',
-  emojiName: 'Smiling Face',
+  emojiName: 'Neutral Face',
 };
 
 export default function Home() {
@@ -30,7 +30,7 @@ export default function Home() {
       }, 1000); // Let animation play
       return () => clearTimeout(timer);
     }
-  }, [animatedReaction]);
+  }, [animatedReaction, frames]);
 
   const onAiReaction = async (message: string) => {
     setIsAiReacting(true);
