@@ -41,13 +41,13 @@ const emojiReactionFlow = ai.defineFlow(
     const { output } = await prompt(message);
     
     // Validate that the combination is valid
-    if (!emojiData.emojis.includes(output!.emoji)) {
+    if (!output || !emojiData.emojis.includes(output.emoji)) {
       // Fallback to a default safe combination if the model hallucinates
       return {
         emoji: 'Smiling Face',
       };
     }
     
-    return output!;
+    return output;
   }
 );

@@ -24,11 +24,10 @@ export default function Home() {
   useEffect(() => {
     if (animatedReaction) {
       const timer = setTimeout(() => {
-        // After animation, update the main frame and reset animation state
         setFrames([animatedReaction]);
         setActiveFrameId(animatedReaction.id);
         setAnimatedReaction(null);
-      }, 1000); // Animation duration
+      }, 1000); // Let animation play
       return () => clearTimeout(timer);
     }
   }, [animatedReaction]);
@@ -42,7 +41,6 @@ export default function Home() {
                 id: crypto.randomUUID(),
                 emojiName: result.reaction.emoji,
             };
-            // Only set the animation. The useEffect will handle updating the main state.
             setAnimatedReaction(newFrame);
 
         } else {
