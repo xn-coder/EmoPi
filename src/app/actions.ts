@@ -1,6 +1,7 @@
 'use server';
 
 import { smoothAnimationTransitions } from '@/ai/flows/smooth-animation-transitions';
+import { emojiReaction } from '@/ai/flows/emoji-reaction-flow';
 import type { Frame } from '@/lib/types';
 import { z } from 'zod';
 
@@ -36,6 +37,16 @@ export async function handleSmoothAnimation(input: { frames: Frame[] }) {
         return result;
     } catch (error) {
         console.error("Error in smoothAnimationTransitions:", error);
+        return { error: "AI processing failed." };
+    }
+}
+
+export async function handleAiReaction(message: string) {
+    try {
+        const result = await emojiReaction(message);
+        return { reaction: result };
+    } catch (error) {
+        console.error("Error in emojiReaction:", error);
         return { error: "AI processing failed." };
     }
 }

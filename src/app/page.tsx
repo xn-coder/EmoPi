@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import type { Frame, EyeOption, MouthOption, EyebrowOption } from '@/lib/types';
 import { eyeOptions, mouthOptions, eyebrowOptions } from '@/lib/types';
 import Header from '@/components/header';
 import EmojiBuilder from '@/components/emoji-builder';
 import AnimationTimeline from '@/components/animation-timeline';
-import { handleSmoothAnimation } from './actions';
+import { handleSmoothAnimation, handleAiReaction } from './actions';
 import { useToast } from "@/hooks/use-toast";
+import ChatInterface from '@/components/chat-interface';
 
 const initialFrame: Frame = {
   id: 'initial-frame',
@@ -22,9 +23,19 @@ export default function Home() {
   const [frames, setFrames] = useState<Frame[]>([initialFrame]);
   const [activeFrameId, setActiveFrameId] = useState<string>(initialFrame.id);
   const [isPending, startTransition] = useTransition();
+  const [isAiReacting, setIsAiReacting] = useState(false);
   const { toast } = useToast();
 
   const activeFrame = frames.find((frame) => frame.id === activeFrameId) || frames[0];
+  const [animatedReaction, setAnimatedReaction] = useState<Frame | null>(null);
+
+  useEffect(() => {
+    if (animatedReaction) {
+      const timer = setTimeout(() => setAnimatedReaction(null), 1000); // Animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [animatedReaction]);
+
 
   const updateFeature = (feature: 'eyes' | 'mouth' | 'eyebrows', value: EyeOption | MouthOption | EyebrowOption) => {
     setFrames((prevFrames) =>
@@ -101,6 +112,39 @@ export default function Home() {
     });
   };
 
+  const onAiReaction = async (message: string) => {
+    setIsAiReacting(true);
+    try {
+        const result = await handleAiReaction(message);
+        if (result && result.reaction) {
+            const newFrame: Frame = {
+                id: crypto.randomUUID(),
+                facialFeatures: {
+                    eyes: (eyeOptions.includes(result.reaction.eyes) ? result.reaction.eyes : 'default') as EyeOption,
+                    mouth: (mouthOptions.includes(result.reaction.mouth) ? result.reaction.mouth : 'smile') as MouthOption,
+                    eyebrows: (eyebrowOptions.includes(result.reaction.eyebrows) ? result.reaction.eyebrows : 'default') as EyebrowOption,
+                }
+            };
+            setAnimatedReaction(newFrame);
+            // Also update the main builder and timeline
+            setFrames([newFrame]);
+            setActiveFrameId(newFrame.id);
+
+        } else {
+            throw new Error(result.error || "Invalid AI response");
+        }
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "AI Reaction Failed",
+            description: "Could not get AI reaction. Please try again.",
+        });
+    } finally {
+        setIsAiReacting(false);
+    }
+  };
+
+
   if (!activeFrame) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -114,9 +158,11 @@ export default function Home() {
       <Header />
       <main className="flex-grow flex flex-col p-4 lg:p-6 gap-6 overflow-y-auto">
         <EmojiBuilder 
-          activeFrame={activeFrame} 
+          activeFrame={animatedReaction || activeFrame}
+          isAnimating={!!animatedReaction}
           onFeatureChange={updateFeature} 
         />
+        <ChatInterface onSendMessage={onAiReaction} isSending={isAiReacting} />
       </main>
        <AnimationTimeline
           frames={frames}
